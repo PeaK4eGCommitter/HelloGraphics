@@ -9,16 +9,13 @@ public class DemoViewer {
         Container pane = frame.getContentPane();
         pane.setLayout(new BorderLayout());
 
-//         slider to control horizontal rotation
         JSlider headingSlider = new JSlider(0, 360, 180);
         pane.add(headingSlider, BorderLayout.SOUTH);
 
-//         slider to control vertical rotation
         JSlider pitchSlider = new JSlider(SwingConstants.VERTICAL, -90, 90, 0);
         pane.add(pitchSlider, BorderLayout.EAST);
 
-        // panel to display render results
-        HelloJPanel renderPanel = new HelloJPanel();
+        HelloJPanel renderPanel = new HelloJPanel(headingSlider.getValue(), pitchSlider.getValue());
 
         headingSlider.addChangeListener(e -> renderPanel.repaintHeading(headingSlider.getValue()));
         pitchSlider.addChangeListener(e -> renderPanel.repaintPitch(pitchSlider.getValue()));
