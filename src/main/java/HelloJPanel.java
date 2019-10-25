@@ -1,15 +1,26 @@
+import models.Cruiser;
+import models.Vessel;
+import models.VesselInterface;
+import models.Wing;
 import util.Matrix3;
 import util.Triangle;
 import util.Vertex;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Graphics;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
 public class HelloJPanel extends JPanel {
     private int sliderHeading;
     private int sliderPitch;
+    private int clockPitch;
+
+    private Vessel cruiser = new Cruiser();
+    private Vessel wing = new Wing();
 
     public HelloJPanel(int sliderHeading, int sliderPitch){
         this.sliderPitch = sliderPitch;
@@ -39,17 +50,23 @@ public class HelloJPanel extends JPanel {
         Matrix3 headingTransform = Matrix3.getMatrix3XZ(heading);
         double pitch = Math.toRadians(sliderPitch);
         Matrix3 pitchTransform = Matrix3.getMatrix3YZ(pitch);
-        return headingTransform.multiply(pitchTransform);
+        double clock = Math.toRadians(clockPitch);
+        Matrix3 clockTransform = Matrix3.getMatrix3XY(clock);
+        return headingTransform.multiply(pitchTransform).multiply(clockTransform);
     }
 
     private void paint(Graphics2D g2){
         Matrix3 transform = getTransform();
 //        g2.translate(getWidth() / 2, getHeight() / 2);
 
+/*
         ArrayList<Triangle> tris = createTris();
         tris = inflate(tris);
         tris = inflate(tris);
         tris = inflate(tris);
+ */
+        List<Triangle> tris = wing.getModel();
+//        List<Triangle> tris = cruiser.getModel();
 //        tris = inflate(tris);
 //        tris = inflate(tris);
 //        tris = inflate(tris);
@@ -182,5 +199,10 @@ public class HelloJPanel extends JPanel {
             }
         }
         return result;
+    }
+
+    public void repaintClock(int clock) {
+        this.clockPitch = clock;
+        repaint();
     }
 }

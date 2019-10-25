@@ -15,10 +15,14 @@ public class DemoViewer {
         JSlider pitchSlider = new JSlider(SwingConstants.VERTICAL, -90, 90, 0);
         pane.add(pitchSlider, BorderLayout.EAST);
 
+        JSlider clockSlider = new JSlider(SwingConstants.VERTICAL, -90, 90, 0);
+        pane.add(clockSlider, BorderLayout.WEST);
+
         HelloJPanel renderPanel = new HelloJPanel(headingSlider.getValue(), pitchSlider.getValue());
 
         headingSlider.addChangeListener(e -> renderPanel.repaintHeading(headingSlider.getValue()));
         pitchSlider.addChangeListener(e -> renderPanel.repaintPitch(pitchSlider.getValue()));
+        clockSlider.addChangeListener(e -> renderPanel.repaintClock(clockSlider.getValue()));
 
         pane.add(renderPanel, BorderLayout.CENTER);
         frame.setSize(400, 400);
