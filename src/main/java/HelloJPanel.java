@@ -1,17 +1,17 @@
 import models.Cruiser;
 import models.Vessel;
-import models.VesselInterface;
 import models.Wing;
 import util.Matrix3;
 import util.Triangle;
 import util.Vertex;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class HelloJPanel extends JPanel {
@@ -59,14 +59,13 @@ public class HelloJPanel extends JPanel {
         Matrix3 transform = getTransform();
 //        g2.translate(getWidth() / 2, getHeight() / 2);
 
-/*
-        ArrayList<Triangle> tris = createTris();
-        tris = inflate(tris);
-        tris = inflate(tris);
-        tris = inflate(tris);
- */
-        List<Triangle> tris = wing.getModel();
-//        List<Triangle> tris = cruiser.getModel();
+
+//        ArrayList<Triangle> tris = createTris();
+                List<Triangle> tris = wing.getModel();
+        //        List<Triangle> tris = cruiser.getModel();
+//        tris = inflate(tris);
+//        tris = inflate(tris);
+//        tris = inflate(tris);
 //        tris = inflate(tris);
 //        tris = inflate(tris);
 //        tris = inflate(tris);
@@ -74,12 +73,7 @@ public class HelloJPanel extends JPanel {
 
         BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
 
-        double[] zBuffer = new double[img.getWidth() * img.getHeight()];
-
-        // initialize array with extremely far away depths
-        for (int q = 0; q < zBuffer.length; q++) {
-            zBuffer[q] = Double.NEGATIVE_INFINITY;
-        }
+        double[] zBuffer = createZBuffer(img);
 
         for (Triangle t : tris) {
             Vertex v1 = transform.transform(t.v1);
@@ -123,7 +117,6 @@ public class HelloJPanel extends JPanel {
                         double depth = b1 * v1.z + b2 * v2.z + b3 * v3.z;
                         int zIndex = y * img.getWidth() + x;
                         if (zBuffer[zIndex] < depth) {
-//                            img.setRGB(x, y, t.color.getRGB());
                             img.setRGB(x, y, getShade(t.color, angleCos).getRGB());
                             zBuffer[zIndex] = depth;
                         }
@@ -133,6 +126,12 @@ public class HelloJPanel extends JPanel {
         }
 
         g2.drawImage(img, 0, 0, null);
+    }
+
+    private double[] createZBuffer(BufferedImage img) {
+        double[] zBuffer = new double[img.getWidth() * img.getHeight()];
+        Arrays.fill(zBuffer, Double.NEGATIVE_INFINITY);
+        return zBuffer;
     }
 
     private static Color getShade(Color color, double shade) {
@@ -179,7 +178,7 @@ public class HelloJPanel extends JPanel {
         return tris;
     }
 
-    public static ArrayList<Triangle> inflate(ArrayList<Triangle> tris) {
+    public static List<Triangle> inflate(List<Triangle> tris) {
         ArrayList<Triangle> result = new ArrayList<>();
         for (Triangle t : tris) {
             Vertex m1 = new Vertex((t.v1.x + t.v2.x)/2, (t.v1.y + t.v2.y)/2, (t.v1.z + t.v2.z)/2);

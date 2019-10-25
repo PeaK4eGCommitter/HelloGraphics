@@ -22,7 +22,26 @@ public class DemoViewer {
 
         headingSlider.addChangeListener(e -> renderPanel.repaintHeading(headingSlider.getValue()));
         pitchSlider.addChangeListener(e -> renderPanel.repaintPitch(pitchSlider.getValue()));
-        clockSlider.addChangeListener(e -> renderPanel.repaintClock(clockSlider.getValue()));
+//        clockSlider.addChangeListener(e -> renderPanel.repaintClock(clockSlider.getValue()));
+
+        Thread myThready = new Thread(new Runnable() {
+            private int angle = 0;
+            public void run(){
+                while (renderPanel != null) {
+                    angle++;
+                    if (angle > 180) {
+                        angle = -180;
+                    }
+                    renderPanel.repaintClock(angle);
+                    try {
+                        Thread.sleep(20);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        myThready.start();
 
         pane.add(renderPanel, BorderLayout.CENTER);
         frame.setSize(400, 400);
