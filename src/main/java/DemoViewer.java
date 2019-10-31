@@ -27,11 +27,12 @@ public class DemoViewer {
 
         Vessel wing = new Wing();
         wing.setCoordinates(new Point3D(100, 0, 0));
+        wing.setDirection(new Point3D(1, 0, 0));
         Vessel cruiser = new Cruiser();
         cruiser.setCoordinates(new Point3D(-100, 0, 0));
         renderPanel.addVessel(wing);
         renderPanel.addVessel(cruiser);
-        for(int i = -80; i <= 80; i+=20){
+        for(int i = -80; i <= 80; i+=40){
             Vessel vessel = new Cruiser();
             vessel.setCoordinates(new Point3D(i, 0, 0));
             renderPanel.addVessel(vessel);

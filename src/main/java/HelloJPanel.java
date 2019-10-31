@@ -206,10 +206,17 @@ public class HelloJPanel extends JPanel {
 
     public void repaintClock(int clock) {
         this.clockPitch = clock;
+        moveVessels();
         repaint();
     }
 
     public void addVessel(Vessel vessel) {
         vessels.add(vessel);
+    }
+
+    private void moveVessels(){
+        for(Vessel vessel : vessels){
+            vessel.move();
+        }
     }
 }
