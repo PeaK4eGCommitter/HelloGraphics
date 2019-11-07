@@ -5,6 +5,8 @@ import models.Wing;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 
 public class DemoViewer {
 
@@ -26,31 +28,46 @@ public class DemoViewer {
         HelloJPanel renderPanel = new HelloJPanel(headingSlider.getValue(), pitchSlider.getValue());
 
         Vessel wing = new Wing();
-        wing.setCoordinates(new Point3D(100, 0, 0));
-        wing.setDirection(new Point3D(1, 0, 0));
+        wing.setCoordinates(new Point3D(100, 100, 0));
+//        wing.setDirection(new Point3D(1, 0, 0));
+        renderPanel.addVessel(wing);
+        /*
         Vessel cruiser = new Cruiser();
         cruiser.setCoordinates(new Point3D(-100, 0, 0));
-        renderPanel.addVessel(wing);
         renderPanel.addVessel(cruiser);
         for(int i = -80; i <= 80; i+=40){
             Vessel vessel = new Cruiser();
             vessel.setCoordinates(new Point3D(i, 0, 0));
             renderPanel.addVessel(vessel);
         }
-
+        */
         headingSlider.addChangeListener(e -> renderPanel.repaintHeading(headingSlider.getValue()));
         pitchSlider.addChangeListener(e -> renderPanel.repaintPitch(pitchSlider.getValue()));
+        renderPanel.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                wing.setDirectionTo(new Point3D(e.getX(), e.getY(), 0));
+            }
+        });
 //        clockSlider.addChangeListener(e -> renderPanel.repaintClock(clockSlider.getValue()));
 
         Thread myThready = new Thread(new Runnable() {
             private int angle = 0;
             public void run(){
                 while (renderPanel != null) {
+                    /*
                     angle++;
                     if (angle > 180) {
                         angle = -180;
                     }
                     renderPanel.repaintClock(angle);
+                    */
+                    renderPanel.repaint();
                     try {
                         Thread.sleep(20);
                     } catch (InterruptedException e) {

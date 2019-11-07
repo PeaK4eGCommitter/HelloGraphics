@@ -51,13 +51,15 @@ public class HelloJPanel extends JPanel {
         Matrix3 headingTransform = Matrix3.getMatrix3XZ(heading);
         double pitch = Math.toRadians(sliderPitch);
         Matrix3 pitchTransform = Matrix3.getMatrix3YZ(pitch);
-        double clock = Math.toRadians(clockPitch);
-        Matrix3 clockTransform = Matrix3.getMatrix3XY(clock);
-        return headingTransform.multiply(pitchTransform).multiply(clockTransform);
+//        double clock = Math.toRadians(clockPitch);
+//        double clock = Math.atan2();
+//        Matrix3 clockTransform = Matrix3.getMatrix3XY(clock);
+//        return headingTransform.multiply(pitchTransform).multiply(clockTransform);
+        return headingTransform.multiply(pitchTransform).multiply(pitchTransform);
     }
 
     private void paint(Graphics2D g2){
-        Matrix3 transform = getTransform();
+        Matrix3 transformBase = getTransform();
 //        g2.translate(getWidth() / 2, getHeight() / 2);
 
 
@@ -80,17 +82,27 @@ public class HelloJPanel extends JPanel {
         for (Vessel vessel : vessels) {
 
             for (Triangle t : vessel.getModel()) {
+                double clock = - Math.atan2(vessel.getDirection().getY(), vessel.getDirection().getX());
+                Matrix3 transform = transformBase.multiply(Matrix3.getMatrix3XY(clock));
                 Vertex v1 = transform.transform(t.v1);
                 Vertex v2 = transform.transform(t.v2);
                 Vertex v3 = transform.transform(t.v3);
 
                 // since we are not using Graphics2D anymore, we have to do translation manually
+                /*
                 v1.x += getWidth() / 2 + vessel.getCoordinates().getX();
                 v1.y += getHeight() / 2 + vessel.getCoordinates().getY();
                 v2.x += getWidth() / 2 + vessel.getCoordinates().getX();
                 v2.y += getHeight() / 2 + vessel.getCoordinates().getY();
                 v3.x += getWidth() / 2 + vessel.getCoordinates().getX();
                 v3.y += getHeight() / 2 + vessel.getCoordinates().getY();
+                */
+                v1.x += vessel.getCoordinates().getX();
+                v1.y += vessel.getCoordinates().getY();
+                v2.x += vessel.getCoordinates().getX();
+                v2.y += vessel.getCoordinates().getY();
+                v3.x += vessel.getCoordinates().getX();
+                v3.y += vessel.getCoordinates().getY();
 
                 Vertex ab = new Vertex(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
                 Vertex ac = new Vertex(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z);
@@ -204,6 +216,12 @@ public class HelloJPanel extends JPanel {
         return result;
     }
 
+    @Override
+    public void repaint(){
+        moveVessels();
+        super.repaint();
+    }
+
     public void repaintClock(int clock) {
         this.clockPitch = clock;
         moveVessels();
@@ -215,8 +233,10 @@ public class HelloJPanel extends JPanel {
     }
 
     private void moveVessels(){
-        for(Vessel vessel : vessels){
-            vessel.move();
+        if(vessels != null) {
+            for (Vessel vessel : vessels) {
+                vessel.move();
+            }
         }
     }
 }

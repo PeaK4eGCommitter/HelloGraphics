@@ -36,4 +36,12 @@ public abstract class Vessel {
             this.direction = direction;
         }
     }
+
+    public Point3D getDirection(){
+        return direction;
+    }
+
+    public void setDirectionTo(Point3D point3D) {
+        setDirection(point3D.subtract(coordinates));
+    }
 }
