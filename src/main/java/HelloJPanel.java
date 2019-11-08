@@ -1,3 +1,4 @@
+import javafx.geometry.Point3D;
 import models.Cruiser;
 import models.Vessel;
 import models.Wing;
@@ -19,8 +20,8 @@ public class HelloJPanel extends JPanel {
     private int sliderPitch;
     private int clockPitch;
 
-    private Vessel cruiser = new Cruiser();
-    private Vessel wing = new Wing();
+//    private Vessel cruiser = new Cruiser();
+//    private Vessel wing = new Wing();
     private List<Vessel> vessels = new ArrayList<>();
 
     public HelloJPanel(int sliderHeading, int sliderPitch){
@@ -64,8 +65,8 @@ public class HelloJPanel extends JPanel {
 
 
 //        ArrayList<Triangle> tris = createTris();
-        List<Triangle> tris = wing.getModel();
-        tris.addAll(cruiser.getModel());
+//        List<Triangle> tris = wing.getModel();
+//        tris.addAll(cruiser.getModel());
         //        List<Triangle> tris = cruiser.getModel();
 //        tris = inflate(tris);
 //        tris = inflate(tris);
@@ -84,53 +85,33 @@ public class HelloJPanel extends JPanel {
             for (Triangle t : vessel.getModel()) {
                 double clock = - Math.atan2(vessel.getDirection().getY(), vessel.getDirection().getX());
                 Matrix3 transform = transformBase.multiply(Matrix3.getMatrix3XY(clock));
-                Vertex v1 = transform.transform(t.v1);
-                Vertex v2 = transform.transform(t.v2);
-                Vertex v3 = transform.transform(t.v3);
+                Vertex vA = transform.transform(t.vA).add(vessel.getCoordinates());
+                Vertex vB = transform.transform(t.vB).add(vessel.getCoordinates());
+                Vertex vC = transform.transform(t.vC).add(vessel.getCoordinates());
 
-                // since we are not using Graphics2D anymore, we have to do translation manually
-                /*
-                v1.x += getWidth() / 2 + vessel.getCoordinates().getX();
-                v1.y += getHeight() / 2 + vessel.getCoordinates().getY();
-                v2.x += getWidth() / 2 + vessel.getCoordinates().getX();
-                v2.y += getHeight() / 2 + vessel.getCoordinates().getY();
-                v3.x += getWidth() / 2 + vessel.getCoordinates().getX();
-                v3.y += getHeight() / 2 + vessel.getCoordinates().getY();
-                */
-                v1.x += vessel.getCoordinates().getX();
-                v1.y += vessel.getCoordinates().getY();
-                v2.x += vessel.getCoordinates().getX();
-                v2.y += vessel.getCoordinates().getY();
-                v3.x += vessel.getCoordinates().getX();
-                v3.y += vessel.getCoordinates().getY();
+                Vertex ab = vB.subtract(vA);
+                Vertex ac = vC.subtract(vA);
+                Point3D norm = new Vertex(
+                        ab.getY() * ac.getZ() - ab.getY() * ac.getY(),
+                        ab.getZ() * ac.getX() - ab.getX() * ac.getZ(),
+                        ab.getX() * ac.getY() - ab.getY() * ac.getX()
+                ).normalize();
 
-                Vertex ab = new Vertex(v2.x - v1.x, v2.y - v1.y, v2.z - v1.z);
-                Vertex ac = new Vertex(v3.x - v1.x, v3.y - v1.y, v3.z - v1.z);
-                Vertex norm = new Vertex(
-                        ab.y * ac.z - ab.z * ac.y,
-                        ab.z * ac.x - ab.x * ac.z,
-                        ab.x * ac.y - ab.y * ac.x
-                );
-                double normalLength = Math.sqrt(norm.x * norm.x + norm.y * norm.y + norm.z * norm.z);
-                norm.x /= normalLength;
-                norm.y /= normalLength;
-                norm.z /= normalLength;
-
-                double angleCos = Math.abs(norm.z);
+                double angleCos = Math.abs(norm.getZ());
                 // compute rectangular bounds for triangle
-                int minX = (int) Math.max(0, Math.ceil(Math.min(v1.x, Math.min(v2.x, v3.x))));
-                int maxX = (int) Math.min(img.getWidth() - 1, Math.floor(Math.max(v1.x, Math.max(v2.x, v3.x))));
-                int minY = (int) Math.max(0, Math.ceil(Math.min(v1.y, Math.min(v2.y, v3.y))));
-                int maxY = (int) Math.min(img.getHeight() - 1, Math.floor(Math.max(v1.y, Math.max(v2.y, v3.y))));
+                int minX = (int) Math.max(0, Math.ceil(Math.min(vA.getX(), Math.min(vB.getX(), vC.getX()))));
+                int maxX = (int) Math.min(img.getWidth() - 1.0, Math.floor(Math.max(vA.getX(), Math.max(vB.getX(), vC.getX()))));
+                int minY = (int) Math.max(0, Math.ceil(Math.min(vA.getY(), Math.min(vB.getY(), vC.getY()))));
+                int maxY = (int) Math.min(img.getHeight() - 1.0, Math.floor(Math.max(vA.getY(), Math.max(vB.getY(), vC.getY()))));
 
-                double triangleArea = (v1.y - v3.y) * (v2.x - v3.x) + (v2.y - v3.y) * (v3.x - v1.x);
+                double triangleArea = (vA.getY() - vC.getY()) * (vB.getX() - vC.getX()) + (vB.getY() - vC.getY()) * (vC.getX() - vA.getX());
                 for (int y = minY; y <= maxY; y++) {
                     for (int x = minX; x <= maxX; x++) {
-                        double b1 = ((y - v3.y) * (v2.x - v3.x) + (v2.y - v3.y) * (v3.x - x)) / triangleArea;
-                        double b2 = ((y - v1.y) * (v3.x - v1.x) + (v3.y - v1.y) * (v1.x - x)) / triangleArea;
-                        double b3 = ((y - v2.y) * (v1.x - v2.x) + (v1.y - v2.y) * (v2.x - x)) / triangleArea;
+                        double b1 = ((y - vC.getY()) * (vB.getX() - vC.getX()) + (vB.getY() - vC.getY()) * (vC.getX() - x)) / triangleArea;
+                        double b2 = ((y - vA.getY()) * (vC.getX() - vA.getX()) + (vC.getY() - vA.getY()) * (vA.getX() - x)) / triangleArea;
+                        double b3 = ((y - vB.getY()) * (vA.getX() - vB.getX()) + (vA.getY() - vB.getY()) * (vB.getX() - x)) / triangleArea;
                         if (b1 >= 0 && b1 <= 1 && b2 >= 0 && b2 <= 1 && b3 >= 0 && b3 <= 1) {
-                            double depth = b1 * v1.z + b2 * v2.z + b3 * v3.z;
+                            double depth = b1 * vA.getZ() + b2 * vB.getZ() + b3 * vC.getZ();
                             int zIndex = y * img.getWidth() + x;
                             if (zBuffer[zIndex] < depth) {
                                 img.setRGB(x, y, getShade(t.color, angleCos).getRGB());
@@ -197,20 +178,18 @@ public class HelloJPanel extends JPanel {
     public static List<Triangle> inflate(List<Triangle> tris) {
         ArrayList<Triangle> result = new ArrayList<>();
         for (Triangle t : tris) {
-            Vertex m1 = new Vertex((t.v1.x + t.v2.x)/2, (t.v1.y + t.v2.y)/2, (t.v1.z + t.v2.z)/2);
-            Vertex m2 = new Vertex((t.v2.x + t.v3.x)/2, (t.v2.y + t.v3.y)/2, (t.v2.z + t.v3.z)/2);
-            Vertex m3 = new Vertex((t.v1.x + t.v3.x)/2, (t.v1.y + t.v3.y)/2, (t.v1.z + t.v3.z)/2);
-            result.add(new Triangle(t.v1, m1, m3, t.color));
-            result.add(new Triangle(t.v2, m1, m2, t.color));
-            result.add(new Triangle(t.v3, m2, m3, t.color));
+            Vertex m1 = new Vertex((t.vA.getX() + t.vB.getX())/2, (t.vA.getY() + t.vB.getY())/2, (t.vA.getZ() + t.vB.getZ())/2);
+            Vertex m2 = new Vertex((t.vB.getX() + t.vC.getX())/2, (t.vB.getY() + t.vC.getY())/2, (t.vB.getZ() + t.vC.getZ())/2);
+            Vertex m3 = new Vertex((t.vA.getX() + t.vC.getX())/2, (t.vA.getY() + t.vC.getY())/2, (t.vA.getZ() + t.vC.getZ())/2);
+            result.add(new Triangle(t.vA, m1, m3, t.color));
+            result.add(new Triangle(t.vB, m1, m2, t.color));
+            result.add(new Triangle(t.vC, m2, m3, t.color));
             result.add(new Triangle(m1, m2, m3, t.color));
         }
         for (Triangle t : result) {
-            for (Vertex v : new Vertex[] { t.v1, t.v2, t.v3 }) {
-                double l = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z) / Math.sqrt(30000);
-                v.x /= l;
-                v.y /= l;
-                v.z /= l;
+            for (Vertex v : new Vertex[] { t.vA, t.vB, t.vC }) {
+                double l = Math.sqrt(v.getX() * v.getX() + v.getY() * v.getY() + v.getZ() * v.getZ()) / Math.sqrt(30000);
+                v = (Vertex) v.multiply(1/l);
             }
         }
         return result;

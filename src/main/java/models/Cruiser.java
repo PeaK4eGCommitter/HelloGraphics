@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Cruiser extends Vessel{
-    private static final Vertex VERTEX_FORWARD = new Vertex(0, SCALE * 6, 0);
-    private static final Vertex VERTEX_LEFT = new Vertex(- SCALE * 2, 0, 0);
-    private static final Vertex VERTEX_RIGHT = new Vertex(SCALE * 2, 0, 0);
-    private static final Vertex VERTEX_BACK = new Vertex(0, - SCALE * 2, 0);
-    private static final Vertex VERTEX_TOP = new Vertex(0, 0, - SCALE);
+    private static final Vertex VERTEX_FORWARD = new Vertex(- SCALE * 6,           0, 0);
+    private static final Vertex VERTEX_LEFT    = new Vertex(          0, - SCALE * 2, 0);
+    private static final Vertex VERTEX_RIGHT   = new Vertex(          0,   SCALE * 2, 0);
+    private static final Vertex VERTEX_BACK    = new Vertex(  SCALE * 2,           0, 0);
+    private static final Vertex VERTEX_TOP     = new Vertex(          0,           0, - SCALE);
 
     @Override
     public List<Triangle> getModel() {
